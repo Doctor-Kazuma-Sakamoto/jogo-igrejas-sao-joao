@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caça às Igrejas de São João del Rei</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(to bottom, #2c1b0f, #5d4037);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #f5f5dc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .game-container {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(60, 30, 10, 0.85);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            border: 3px solid #d4af37;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #8b4513, #a0522d);
+            padding: 15px;
+            text-align: center;
+            border-bottom: 3px solid #d4af37;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            text-shadow: 2px 2px 0 #000;
+            margin-bottom: 8px;
+            color: #d4af37;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            color: #f5f5dc;
+            margin-bottom: 12px;
+        }
+        
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px;
+            border-radius: 10px;
+            margin-top: 12px;
+            font-size: 0.9rem;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #d4af37;
+        }
+        
+        .game-area {
+            display: flex;
+            padding: 15px;
+            gap: 15px;
+        }
+        
+        .map-container {
+            flex: 1;
+            position: relative;
+            border: 5px solid #5d4037;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #8d6e63;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            min-height: 350px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .map-image {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            cursor: pointer;
+            background: #7c5e4f;
+        }
+        
+        .controls {
+            width: 280px;
+            background: rgba(139, 69, 19, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            border: 2px solid #d4af37;
+        }
+        
+        h2 {
+            color: #d4af37;
+            margin-bottom: 12px;
+            text-align: center;
+            font-size: 1.4rem;
+            text-shadow: 1px 1px 1px #000;
+        }
+        
+        .feedback {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 10px;
+            min-height: 90px;
+            margin-bottom: 15px;
+            border: 1px solid #d4af37;
+            font-size: 0.95rem;
+        }
+        
+        .feedback p {
+            line-height: 1.4;
+            color: #f5f5dc;
+        }
+        
+        .clue {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border-left: 4px solid #d4af37;
+            font-size: 0.9rem;
+        }
+        
+        .clue p {
+            color: #e6d3a7;
+            font-style: italic;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #resetBtn {
+            background: linear-gradient(to bottom, #a0522d, #8b4513);
+            color: #f5f5dc;
+        }
+        
+        #hintBtn {
+            background: linear-gradient(to bottom, #d4af37, #b8860b);
+            color: #2c1b0f;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .instructions {
+            background: rgba(139, 69, 19, 0.2);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 15px;
+            border: 1px solid #d4af37;
+            font-size: 0.85rem;
+        }
+        
+        .instructions h3 {
+            color: #d4af37;
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+        
+        .instructions ul {
+            padding-left: 15px;
+            color: #e6d3a7;
+        }
+        
+        .instructions li {
+            margin: 5px 0;
+        }
+        
+        .treasure-found {
+            animation: pulse 1s infinite;
+            color: #d4af37;
+            font-weight: bold;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .attempt-marker {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: rgba(184, 134, 11, 0.7);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            border: 2px solid #d4af37;
+            font-size: 0.7rem;
+        }
+        
+        .church-info {
+            display: none;
+            position: absolute;
+            background: rgba(60, 30, 10, 0.95);
+            border: 2px solid #d4af37;
+            border-radius: 10px;
+            padding: 10px;
+            width: 200px;
+            z-index: 100;
+            color: #f5f5dc;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            font-size: 0.8rem;
+        }
+        
+        .church-info h3 {
+            color: #d4af37;
+            margin-bottom: 5px;
+            border-bottom: 1px solid #d4af37;
+            padding-bottom: 3px;
+            font-size: 1rem;
+        }
+        
+        .found-church {
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            background: rgba(0, 200, 0, 0.3);
+            border-radius: 50%;
+            border: 3px solid #d4af37;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.3rem;
+            animation: foundPulse 2s infinite;
+        }
+        
+        @keyframes foundPulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        @media (max-width: 800px) {
+            .game-area {
+                flex-direction: column;
+            }
+            
+            .controls {
+                width: 100%;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .map-container {
+                min-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>Caça às Igrejas de São João del Rei</h1>
+            <p class="subtitle">Descubra as igrejas históricas no mapa da cidade colonial mineira</p>
+            <div class="game-stats">
+                <div class="stat">
+                    <div>Tentativas</div>
+                    <div class="stat-value" id="attempts">10</div>
+                </div>
+                <div class="stat">
+                    <div>Encontradas</div>
+                    <div class="stat-value" id="found">0</div>
+                </div>
+                <div class="stat">
+                    <div>Dicas</div>
+                    <div class="stat-value" id="hints">3</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-area">
+            <div class="map-container">
+                <!-- Imagem do mapa com as coordenadas ajustadas -->
+                <img id="mapImage" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj2xWqwiYogAwkrSYhbjB2MtEuxxHWflD6m5rJNBKdRmFpqas_e_b8iI0glpdy9dxt9iViSOsEzLZLlYtq2PPMaHdFbut5kZwjLWE0kAO44P1zRCSN__qpOzcu4WnZ2Ac9hAQssf5llw4JL/s640/Captura+de+Tela+2016-08-01+a%25CC%2580s+4.56.45+PM.png" 
+                     alt="Mapa de São João del Rei" class="map-image">
+                <div class="church-info" id="churchInfo"></div>
+            </div>
+            
+            <div class="controls">
+                <h2>Diário do Explorador</h2>
+                
+                <div class="feedback">
+                    <p id="message">Bem-vindo! Clique no mapa para descobrir as igrejas históricas de São João del Rei. Você tem 10 tentativas para encontrar 3 igrejas!</p>
+                </div>
+                
+                <div class="clue">
+                    <p id="clueText">Dica atual: Procure por uma igreja com fachada barroca e torres sineiras!</p>
+                </div>
+                
+                <div class="buttons">
+                    <button id="resetBtn">Novo Jogo</button>
+                    <button id="hintBtn">Dica (3)</button>
+                </div>
+                
+                <div class="instructions">
+                    <h3>Como Jogar:</h3>
+                    <ul>
+                        <li>Clique em diferentes locais do mapa para encontrar igrejas</li>
+                        <li>Encontre 3 igrejas antes que suas tentativas acabem</li>
+                        <li>Use as dicas quando estiver com dificuldade</li>
+                        <li>Igrejas aparecem em novos locais após cada descoberta</li>
+                        <li>Descubra informações sobre cada igreja encontrada</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos do jogo
+            const mapImage = document.getElementById('mapImage');
+            const messageEl = document.getElementById('message');
+            const clueTextEl = document.getElementById('clueText');
+            const attemptsEl = document.getElementById('attempts');
+            const foundEl = document.getElementById('found');
+            const hintsEl = document.getElementById('hints');
+            const resetBtn = document.getElementById('resetBtn');
+            const hintBtn = document.getElementById('hintBtn');
+            const mapContainer = document.querySelector('.map-container');
+            const churchInfoEl = document.getElementById('churchInfo');
+            
+            // Estado do jogo
+            let attempts = 10;
+            let found = 0;
+            let hints = 3;
+            let churchLocations = [];
+            
+            // Igrejas de São João del Rei com coordenadas ajustadas para a nova imagem
+            const allChurches = [
+                {
+                    name: "Igreja de São Francisco de Assis",
+                    coords: [180, 350],
+                    clues: ["Obra-prima do barroco mineiro", "Projetada por Aleijadinho", "Cemitério anexo com túmulos históricos"],
+                    info: "Construída no século XVIII, é uma das mais belas igrejas barrocas do Brasil. Possui altares dourados e obras de arte sacra."
+                },
+                {
+                    name: "Catedral Basílica de Nossa Senhora do Pilar",
+                    coords: [320, 240],
+                    clues: ["Matriz da cidade", "Construção mais antiga", "Tesouro com mais de 400 quilos de prata"],
+                    info: "Fundada em 1721, é a igreja matriz da cidade. Possui um rico acervo de arte sacra e altares trabalhados em ouro."
+                },
+                {
+                    name: "Igreja de Nossa Senhora do Carmo",
+                    coords: [420, 180],
+                    clues: ["Estilo rococó", "Fachada com volutas", "Ordem Terceira do Carmo"],
+                    info: "Construída em 1787, apresenta fachada em estilo rococó com torres arredondadas. Interior decorado com talha dourada."
+                },
+                {
+                    name: "Igreja de Nossa Senhora do Rosário",
+                    coords: [120, 240],
+                    clues: ["Irmandade dos Homens Pretos", "Estilo barroco simples", "Localizada em colina"],
+                    info: "Construída pela Irmandade dos Homens Pretos no século XVIII. Apresenta arquitetura mais simples que as demais igrejas."
+                },
+                {
+                    name: "Igreja de Santo Antônio",
+                    coords: [400, 300],
+                    clues: ["Padroeiro dos pobres", "Torres desiguais", "Construção em adobe"],
+                    info: "Datada de 1730, é conhecida por suas torres assimétricas. Construída com técnica de adobe (terra socada)."
+                },
+                {
+                    name: "Igreja de São Gonçalo Garcia",
+                    coords: [300, 330],
+                    clues: ["Santo padroeiro dos ferreiros", "Construção em pedra", "Portal trabalhado"],
+                    info: "Erguida pela Irmandade dos Homens Pardos em 1764. Possui belo frontispício em pedra-sabão."
+                },
+                {
+                    name: "Igreja de Nossa Senhora das Mercês",
+                    coords: [320, 180],
+                    clues: ["Estilo neoclássico", "Fachada sóbria", "Irmandade das Mercês"],
+                    info: "Construída no início do século XIX, mostra transição do barroco para o neoclássico. Interior com talha mais discreta."
+                },
+                {
+                    name: "Santuário de São João Bosco",
+                    coords: [480, 240],
+                    clues: ["Estilo moderno", "Construída no século XX", "Homenagem ao santo italiano"],
+                    info: "Construída em estilo moderno, destaca-se pela arquitetura contemporânea em meio ao cenário colonial."
+                }
+            ];
+            
+            // Inicializar jogo
+            initGame();
+            
+            // Manipulador de clique no mapa
+            mapImage.addEventListener('click', function(e) {
+                if (attempts <= 0 || found >= 3) return;
+                
+                const rect = mapImage.getBoundingClientRect();
+                const scaleX = 640 / rect.width; // Largura original da imagem
+                const scaleY = 480 / rect.height; // Altura original da imagem
+                
+                // Calcular coordenadas relativas à imagem original
+                const x = (e.clientX - rect.left) * scaleX;
+                const y = (e.clientY - rect.top) * scaleY;
+                
+                // Criar marcador de tentativa
+                const marker = document.createElement('div');
+                marker.className = 'attempt-marker';
+                marker.style.left = (e.clientX - rect.left) + 'px';
+                marker.style.top = (e.clientY - rect.top) + 'px';
+                marker.textContent = attempts;
+                mapContainer.appendChild(marker);
+                
+                // Remover marcador após animação
+                setTimeout(() => {
+                    marker.style.transition = 'opacity 1s';
+                    marker.style.opacity = '0';
+                    setTimeout(() => marker.remove(), 1000);
+                }, 1500);
+                
+                // Verificar se encontrou uma igreja
+                attempts--;
+                attemptsEl.textContent = attempts;
+                
+                let foundChurch = false;
+                let foundChurchData = null;
+                
+                churchLocations.forEach(church => {
+                    const distance = Math.sqrt(
+                        Math.pow(x - church.coords[0], 2) + 
+                        Math.pow(y - church.coords[1], 2)
+                    );
+                    
+                    // Área de detecção de 35px
+                    if (distance < 35) {
+                        foundChurch = true;
+                        foundChurchData = church;
+                        found++;
+                        foundEl.textContent = found;
+                        messageEl.innerHTML = `⛪ <span class="treasure-found">Igreja Encontrada!</span> Você descobriu ${church.name}!`;
+                        
+                        // Criar marcador de igreja encontrada
+                        const foundMarker = document.createElement('div');
+                        foundMarker.className = 'found-church';
+                        foundMarker.innerHTML = '✓';
+                        foundMarker.style.left = (church.coords[0] / scaleX) + 'px';
+                        foundMarker.style.top = (church.coords[1] / scaleY) + 'px';
+                        mapContainer.appendChild(foundMarker);
+                        
+                        // Mostrar informações da igreja
+                        showChurchInfo(church, e.clientX - rect.left, e.clientY - rect.top);
+                        
+                        // Remover igreja encontrada
+                        const index = churchLocations.indexOf(church);
+                        if (index > -1) {
+                            churchLocations.splice(index, 1);
+                        }
+                        
+                        // Adicionar nova igreja se necessário
+                        if (found < 3) {
+                            setTimeout(() => {
+                                addNewChurch();
+                                updateClue();
+                                messageEl.innerHTML = `Ótimo trabalho! Outra igreja foi escondida em outro lugar. Restam ${3-found} para encontrar!`;
+                            }, 2000);
+                        }
+                    }
+                });
+                
+                if (!foundChurch) {
+                    messageEl.textContent = "Nenhuma igreja aqui! Continue explorando!";
+                }
+                
+                // Verificar status do jogo
+                checkGameStatus();
+            });
+            
+            // Botão de dica
+            hintBtn.addEventListener('click', function() {
+                if (hints > 0 && found < 3) {
+                    hints--;
+                    hintsEl.textContent = hints;
+                    updateClue(true); // Forçar nova dica
+                    
+                    // Destacar uma igreja não encontrada
+                    if (churchLocations.length > 0) {
+                        const church = churchLocations[Math.floor(Math.random() * churchLocations.length)];
+                        
+                        // Criar efeito de destaque
+                        const rect = mapImage.getBoundingClientRect();
+                        const scaleX = 640 / rect.width;
+                        const scaleY = 480 / rect.height;
+                        
+                        const hintMarker = document.createElement('div');
+                        hintMarker.className = 'attempt-marker';
+                        hintMarker.style.background = 'rgba(0, 200, 200, 0.7)';
+                        hintMarker.style.left = (church.coords[0] / scaleX) + 'px';
+                        hintMarker.style.top = (church.coords[1] / scaleY) + 'px';
+                        hintMarker.style.width = '40px';
+                        hintMarker.style.height = '40px';
+                        hintMarker.style.zIndex = '50';
+                        hintMarker.textContent = '?';
+                        mapContainer.appendChild(hintMarker);
+                        
+                        setTimeout(() => {
+                            hintMarker.style.transition = 'opacity 1s';
+                            hintMarker.style.opacity = '0';
+                            setTimeout(() => hintMarker.remove(), 1000);
+                        }, 1500);
+                        
+                        messageEl.textContent = `Dica: Tente perto de ${church.name}`;
+                    }
+                } else {
+                    messageEl.textContent = hints > 0 ? 
+                        "Você já encontrou todas as igrejas!" : 
+                        "Sem dicas restantes!";
+                }
+            });
+            
+            // Botão de reiniciar
+            resetBtn.addEventListener('click', initGame);
+            
+            // Funções do jogo
+            function initGame() {
+                // Resetar estado do jogo
+                attempts = 10;
+                found = 0;
+                hints = 3;
+                churchLocations = [];
+                
+                // Atualizar UI
+                attemptsEl.textContent = attempts;
+                foundEl.textContent = found;
+                hintsEl.textContent = hints;
+                messageEl.textContent = "Novo jogo iniciado! Encontre 3 igrejas no mapa de São João del Rei.";
+                churchInfoEl.style.display = 'none';
+                
+                // Limpar marcadores
+                document.querySelectorAll('.attempt-marker, .found-church').forEach(m => m.remove());
+                
+                // Inicializar igrejas
+                addNewChurch();
+                addNewChurch();
+                addNewChurch();
+                
+                updateClue();
+            }
+            
+            function addNewChurch() {
+                // Obter localização não utilizada
+                const availableChurches = allChurches.filter(church => 
+                    !churchLocations.some(c => c.name === church.name)
+                );
+                
+                if (availableChurches.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * availableChurches.length);
+                    churchLocations.push(availableChurches[randomIndex]);
+                }
+            }
+            
+            function updateClue(forceNew = false) {
+                if (churchLocations.length === 0) return;
+                
+                // Obter igreja aleatória
+                const church = churchLocations[Math.floor(Math.random() * churchLocations.length)];
+                
+                // Obter dica aleatória
+                const clue = church.clues[Math.floor(Math.random() * church.clues.length)];
+                
+                clueTextEl.innerHTML = `Dica atual: <em>"${clue}"</em>`;
+            }
+            
+            function showChurchInfo(church, x, y) {
+                churchInfoEl.innerHTML = `
+                    <h3>${church.name}</h3>
+                    <p>${church.info}</p>
+                `;
+                churchInfoEl.style.left = (x + 20) + 'px';
+                churchInfoEl.style.top = (y - 10) + 'px';
+                churchInfoEl.style.display = 'block';
+                
+                // Esconder informações após 5 segundos
+                setTimeout(() => {
+                    churchInfoEl.style.display = 'none';
+                }, 5000);
+            }
+            
+            function checkGameStatus() {
+                if (found >= 3) {
+                    messageEl.innerHTML = "🏆 <span class='treasure-found'>Vitória!</span> Você encontrou todas as três igrejas! Você é um verdadeiro conhecedor do patrimônio histórico!";
+                    hintBtn.disabled = true;
+                } else if (attempts <= 0) {
+                    messageEl.textContent = "⛔ Fim de jogo! Suas tentativas acabaram. Tente novamente para descobrir mais igrejas!";
+                    hintBtn.disabled = true;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
